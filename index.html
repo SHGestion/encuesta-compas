@@ -278,6 +278,7 @@ function elegir(t){
   tipo = t;
   document.querySelectorAll(".tipo").forEach(x => x.setAttribute("aria-pressed", x.dataset.tipo === t));
   render();
+  if (yaRespondio()) mostrarYaRespondida();
 }
 // QR directo: encuesta.html?tipo=corporativo  o  ?tipo=marina
 // También acepta ?tipo=corporativo y ?tipo=marina
@@ -285,6 +286,19 @@ const ALIAS = {corporativo:"linea", marina:"transportado"};
 const _t = (new URLSearchParams(location.search).get("tipo") || "").toLowerCase();
 const pre = ALIAS[_t] || _t;
 if (ENCUESTAS[pre]){ elegir(pre); $("#cardTipo").classList.add("hidden"); }
+
+
+/* ---------- Una respuesta por celular por mes ---------- */
+function mesActual(){ return new Date().toISOString().slice(0,7); }
+function claveResp(){ return "encuesta_compas_resp_" + (tipo || "x"); }
+function yaRespondio(){ try{ return localStorage.getItem(claveResp()) === mesActual(); }catch(e){ return false; } }
+function marcarRespondida(){ try{ localStorage.setItem(claveResp(), mesActual()); }catch(e){} }
+function mostrarYaRespondida(){
+  $("#form").classList.add("hidden");
+  $("#gracias").classList.remove("hidden");
+  $("#graciasTxt").textContent = "Usted ya respondió la encuesta este mes. ¡Gracias por su participación!";
+  $("#bar").style.width = "100%";
+}
 
 /* ---------- Envío ---------- */
 $("#form").addEventListener("submit", async e => {
@@ -306,6 +320,7 @@ $("#form").addEventListener("submit", async e => {
   const btn = $("#enviar"); btn.disabled = true; btn.textContent = "Enviando…";
   const ok = await enviar(payload);
   if (!ok) guardarPendiente(payload);
+  marcarRespondida();
   $("#form").classList.add("hidden");
   $("#gracias").classList.remove("hidden");
   if (!ok) $("#graciasTxt").textContent = "Sin conexión en este momento: su respuesta quedó guardada y se enviará automáticamente.";
