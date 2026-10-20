@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Encuesta de Satisfacción · Alimentación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== CONFIGURACIÓN DE MARCA =====================
+   Ajuste aquí los colores al tono exacto de Compas Marine.          */
+:root{
+  --navy:#2e3940;        /* gris pizarra Compas Marine (textos y títulos) */
+  --navy-2:#2e3940;
+  --accent:#902632;      /* rojo vino Compas Marine (acento, selección) */
+  --accent-soft:#f6e9eb;
+  --ink:#2e3940;
+  --muted:#6b767d;
+  --line:#e3e4e5;
+  --bg:#f4f5f6;
+  --card:#ffffff;
+  --ok:#2e9e6a;
+  --bad:#c0392b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Open Sans",system-ui,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3,.btn,.chip{font-family:"Montserrat",system-ui,sans-serif}
+.band{height:12px;background:linear-gradient(105deg,var(--accent) 0 78%,var(--navy) 78.2% 100%)}
+header{background:#fff;color:var(--navy);padding:24px 16px 58px;text-align:center;border-bottom:1px solid var(--line)}
+header img{height:52px;max-width:70%;object-fit:contain}
+header h1{font-size:1.3rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin:16px 0 4px;color:var(--navy)}
+header h1::after{content:"";display:block;width:56px;height:3px;background:var(--accent);margin:10px auto 0;border-radius:2px}
+header p{margin:8px 0 0;color:var(--muted);font-size:.95rem}
+.wrap{max-width:720px;margin:-36px auto 40px;padding:0 16px}
+.card{background:var(--card);border-radius:14px;box-shadow:0 4px 18px rgba(46,57,64,.08);padding:22px 18px;margin-bottom:16px}
+.card h2{font-size:1rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;display:flex;gap:10px;align-items:center}
+.card h2 .n{background:var(--accent);color:#fff;border-radius:6px;width:28px;height:28px;display:inline-grid;place-items:center;font-size:.85rem}
+.hint{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+.progress{position:sticky;top:0;z-index:5;height:5px;background:var(--line)}
+.progress div{height:100%;width:0;background:var(--accent);transition:width .25s}
+/* selector de tipo */
+.tipos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tipo{border:2px solid var(--line);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;background:#fff;font:inherit}
+.tipo strong{display:block;font-family:Montserrat;color:var(--navy);margin-top:6px}
+.tipo span{font-size:.82rem;color:var(--muted)}
+.tipo svg{width:34px;height:34px;stroke:var(--accent)}
+.tipo[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+/* preguntas */
+.q{padding:14px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.q label.t{display:block;font-weight:600;margin-bottom:10px}
+.q.err label.t{color:var(--bad)}
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.chip{flex:1 1 0;min-width:44px;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:10px 0;font-weight:700;font-size:1rem;color:var(--navy);cursor:pointer}
+.chip.na{flex:0 0 auto;padding:10px 12px;font-size:.8rem;color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.scale.nps .chip{min-width:28px;font-size:.9rem;padding:9px 0}
+.ends{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-top:4px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts .chip{flex:0 1 auto;padding:9px 14px;font-weight:600;font-size:.9rem}
+textarea{width:100%;min-height:76px;border:1.5px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+textarea:focus,.chip:focus-visible,.tipo:focus-visible{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.alerta{background:#fff4f4;border-left:4px solid var(--bad);padding:10px 12px;border-radius:6px;font-size:.88rem;margin-top:10px;display:none}
+.btn{display:block;width:100%;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;font-size:1rem;letter-spacing:.05em;text-transform:uppercase;padding:16px;cursor:pointer}
+.btn:disabled{opacity:.6}
+.msg{text-align:center;padding:40px 18px}
+.msg svg{width:64px;height:64px;stroke:var(--ok)}
+.msg h2{justify-content:center;font-size:1.2rem}
+footer{text-align:center;font-size:.78rem;color:var(--muted);padding:0 16px 30px}
+.hidden{display:none!important}
+@media (max-width:420px){.chip{min-width:38px}.scale.nps{gap:4px}}
+</style>
+</head>
+<body>
+<div class="progress"><div id="bar"></div></div>
+<div class="band"></div>
+<header>
+  <img src="https://compasmarine.cl/wp-content/uploads/Compas-Marine.png" alt="Compas Marine" onerror="this.style.display='none'">
+  <h1>Encuesta de satisfacción</h1>
+  <p>Servicio de alimentación · Anónima · Menos de 3 minutos</p>
+</header>
+
+<main class="wrap">
+  <form id="form" novalidate>
+    <section class="card" id="cardTipo">
+      <h2><span class="n">1</span>¿Dónde recibe su servicio?</h2>
+      <p class="hint">Su opinión nos ayuda a mejorar cada día.</p>
+      <div class="tipos">
+        <button type="button" class="tipo" data-tipo="linea" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M4 11h16M6 11v7M18 11v7M8 7h8"/><circle cx="12" cy="5" r="1.5"/></svg>
+          <strong>Corporativo</strong><span>Servicio en línea</span>
+        </button>
+        <button type="button" class="tipo" data-tipo="transportado" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>
+          <strong>Marina</strong><span>Servicio transportado</span>
+        </button>
+      </div>
+    </section>
+    <div id="secciones"></div>
+    <button class="btn hidden" id="enviar" type="submit">Enviar encuesta</button>
+  </form>
+
+  <section class="card msg hidden" id="gracias">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+    <h2>¡Gracias por su opinión!</h2>
+    <p id="graciasTxt">Sus respuestas fueron registradas.</p>
+  </section>
+</main>
+<footer>Servicio de alimentación operado por SH Gestión y Servicios SpA para Compas Marine</footer>
+
+<script>
+/* ===================== CONFIGURACIÓN =====================
+   Pegue aquí la URL de la implementación de Google Apps Script (termina en /exec) */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxNYOMEk-Lo3bTQqr4Mlu3USYK7PWJH4W1lSQIxzoI3mKsAsVXXAtEDEUBggb2FB626NQ/exec";
+
+/* ---------- Definición de las encuestas ----------
+   r = escala 1–5 · na = permite "No aplica" · o = opción única · t = texto · nps = 0–10 */
+const ENCUESTAS = {
+  linea: [
+    {t:"Datos generales", q:[
+      {k:"servicio", l:"Servicio", o:["Desayuno","Almuerzo","Once","Cena"]},
+      {k:"area", l:"Área de trabajo", o:["Taller","Operaciones","Otra"]},
+      {k:"turno", l:"Turno", o:["Día","Noche"]},
+      {k:"frecuencia", l:"¿Con qué frecuencia utiliza el comedor?", o:["Todos los días","3–4 veces por semana","1–2 veces por semana","Ocasionalmente"]}
+    ]},
+    {t:"Calidad de la alimentación", q:[
+      {k:"sabor", l:"Sabor y sazón de las preparaciones", r:1},
+      {k:"coccion", l:"Punto de cocción (carnes, arroz, pastas, verduras)", r:1},
+      {k:"temperatura", l:"Temperatura de los platos al servirse", r:1},
+      {k:"porcion", l:"Tamaño de la porción", r:1},
+      {k:"frescura", l:"Frescura y calidad de ensaladas y frutas", r:1},
+      {k:"presentacion", l:"Presentación y apariencia de los platos", r:1},
+      {k:"complementos", l:"Calidad del pan, postres y bebestibles", r:1}
+    ]},
+    {t:"Menú y variedad", q:[
+      {k:"variedad", l:"Variedad del menú durante la semana", r:1},
+      {k:"minuta", l:"Cumplimiento de la minuta publicada", r:1},
+      {k:"opciones", l:"Opciones disponibles (alternativo, vegetariano, liviano)", r:1, na:1},
+      {k:"nutricion", l:"Equilibrio y aporte nutricional percibido", r:1}
+    ]},
+    {t:"Atención y servicio", q:[
+      {k:"amabilidad", l:"Amabilidad y trato del personal", r:1},
+      {k:"rapidez", l:"Rapidez de la atención en la línea", r:1},
+      {k:"espera", l:"Tiempo de espera en la fila", r:1},
+      {k:"reclamos", l:"Disposición para resolver solicitudes o reclamos", r:1, na:1},
+      {k:"presentacion_personal", l:"Presentación personal del equipo (uniforme, cofia, higiene)", r:1}
+    ]},
+    {t:"Higiene e instalaciones", q:[
+      {k:"limpieza_comedor", l:"Limpieza del comedor (mesas, sillas, piso)", r:1},
+      {k:"limpieza_vajilla", l:"Limpieza de vajilla, bandejas y cubiertos", r:1},
+      {k:"limpieza_linea", l:"Orden y limpieza de la línea de servicio", r:1},
+      {k:"ambiente", l:"Comodidad y ambiente del comedor (temperatura, ruido, espacio)", r:1},
+      {k:"insumos_mesa", l:"Disponibilidad de agua, aderezos, servilletas y condimentos", r:1}
+    ]},
+    {t:"Evaluación global", q:[
+      {k:"satisfaccion", l:"Satisfacción general con el servicio de alimentación", r:1},
+      {k:"expectativa", l:"Calidad del servicio en relación con lo esperado", r:1},
+      {k:"nps", l:"De 0 a 10, ¿qué tan probable es que recomiende este servicio a un compañero?", nps:1},
+      {k:"tendencia", l:"Comparado con hace 3 meses, el servicio está…", o:["Mejor","Igual","Peor","No sabría decir"]}
+    ]},
+    {t:"Comentarios", q:[
+      {k:"gusta", l:"¿Qué preparaciones le gustan más?", t:1},
+      {k:"cambiar", l:"¿Qué preparación quitaría o le gustaría que incorporáramos?", t:1},
+      {k:"mejorar", l:"¿Qué es lo más importante que deberíamos mejorar?", t:1}
+    ]}
+  ],
+  transportado: [
+    {t:"Datos generales", q:[
+      {k:"frecuencia", l:"¿Con qué frecuencia recibe el servicio?", o:["Todos los días","3–4 veces por semana","1–2 veces por semana","Ocasionalmente"]},
+      {k:"modo_pedido", l:"¿Cómo elige su menú?", o:["Aplicación / formulario digital","A través de un coordinador","Menú fijo, no elijo"]}
+    ]},
+    {t:"Entrega y logística", q:[
+      {k:"puntualidad", l:"Puntualidad de la entrega en el horario acordado", r:1},
+      {k:"exactitud", l:"Exactitud del pedido (recibe la preparación que eligió)", r:1},
+      {k:"completo", l:"Pedido completo (ensalada, postre, pan, cubiertos, servilleta)", r:1},
+      {k:"repartidor", l:"Amabilidad y presentación de quien entrega", r:1},
+      {k:"sistema_pedido", l:"Facilidad del sistema de pedido o elección de menú", r:1, na:1}
+    ]},
+    {t:"Envase y etiquetado", q:[
+      {k:"estado_envase", l:"Estado del envase al recibirlo (sin derrames, golpes ni deformaciones)", r:1},
+      {k:"sellado", l:"Sellado e inviolabilidad del envase", r:1},
+      {k:"etiqueta", l:"Claridad de la etiqueta (nombre, preparación, fecha)", r:1},
+      {k:"practicidad", l:"Practicidad del envase para comer (tamaño, separación, apto microondas)", r:1}
+    ]},
+    {t:"Calidad de la alimentación", q:[
+      {k:"temperatura", l:"Temperatura de la comida al recibirla", r:1},
+      {k:"sabor", l:"Sabor y sazón de las preparaciones", r:1},
+      {k:"textura", l:"Textura tras el transporte (sin resecarse ni quedar aguada)", r:1},
+      {k:"porcion", l:"Tamaño de la porción", r:1},
+      {k:"frescura", l:"Frescura de ensaladas y frutas", r:1},
+      {k:"presentacion", l:"Presentación del plato al abrir el envase", r:1}
+    ]},
+    {t:"Menú y variedad", q:[
+      {k:"variedad", l:"Variedad del menú durante la semana", r:1},
+      {k:"opciones", l:"Opciones disponibles (alternativo, vegetariano, liviano)", r:1, na:1},
+      {k:"nutricion", l:"Equilibrio y aporte nutricional percibido", r:1}
+    ]},
+    {t:"Evaluación global", q:[
+      {k:"satisfaccion", l:"Satisfacción general con el servicio de alimentación", r:1},
+      {k:"comunicacion", l:"Comunicación ante cambios, atrasos o reclamos", r:1, na:1},
+      {k:"nps", l:"De 0 a 10, ¿qué tan probable es que recomiende este servicio a un compañero?", nps:1},
+      {k:"tiempo_consumo", l:"¿Cuánto tiempo pasa entre que recibe su almuerzo y lo consume?", o:["Menos de 15 min","15–30 min","30–60 min","Más de 60 min"]},
+      {k:"calienta", l:"¿Calienta su almuerzo antes de consumirlo?", o:["Nunca","A veces","Siempre","No tengo microondas"]}
+    ]},
+    {t:"Comentarios", q:[
+      {k:"gusta", l:"¿Qué preparaciones llegan mejor?", t:1},
+      {k:"cambiar", l:"¿Qué preparación no viaja bien o le gustaría cambiar?", t:1},
+      {k:"mejorar", l:"¿Qué es lo más importante que deberíamos mejorar?", t:1}
+    ]}
+  ]
+};
+
+/* ---------- Render ---------- */
+const $ = s => document.querySelector(s);
+let tipo = null, respuestas = {};
+
+function render(){
+  respuestas = {};
+  const cont = $("#secciones"); cont.innerHTML = "";
+  ENCUESTAS[tipo].forEach((sec, i) => {
+    const card = document.createElement("section"); card.className = "card";
+    card.innerHTML = `<h2><span class="n">${i+(pre && ENCUESTAS[pre] ? 1 : 2)}</span>${sec.t}</h2>` +
+      (sec.q.some(q=>q.r) ? `<p class="hint">1 = Muy insatisfecho · 5 = Muy satisfecho</p>` : "");
+    sec.q.forEach(q => card.appendChild(pregunta(q)));
+    cont.appendChild(card);
+  });
+  $("#enviar").classList.remove("hidden");
+  progreso();
+}
+
+function pregunta(q){
+  const d = document.createElement("div"); d.className = "q"; d.dataset.k = q.k;
+  d.innerHTML = `<label class="t">${q.l}${q.t ? ' <small style="font-weight:400;color:var(--muted)">(opcional)</small>' : ''}</label>`;
+  if (q.t){
+    const ta = document.createElement("textarea"); ta.maxLength = 500;
+    ta.addEventListener("input", () => respuestas[q.k] = ta.value.trim());
+    d.appendChild(ta); return d;
+  }
+  const box = document.createElement("div");
+  let vals;
+  if (q.r){ box.className = "scale"; vals = ["1","2","3","4","5"]; if (q.na) vals.push("N/A"); }
+  else if (q.nps){ box.className = "scale nps"; vals = [...Array(11).keys()].map(String); }
+  else { box.className = "opts"; vals = q.o; }
+  vals.forEach(v => {
+    const b = document.createElement("button"); b.type = "button";
+    b.className = "chip" + (v==="N/A" ? " na" : ""); b.textContent = v === "N/A" ? "No aplica" : v;
+    b.setAttribute("aria-pressed","false");
+    b.onclick = () => {
+      box.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed","false"));
+      b.setAttribute("aria-pressed","true");
+      respuestas[q.k] = (q.r || q.nps) && v !== "N/A" ? Number(v) : v;
+      d.classList.remove("err");
+      if (q.alerta){ al.style.display = v === "Sí" ? "block" : "none"; }
+      progreso();
+    };
+    box.appendChild(b);
+  });
+  d.appendChild(box);
+  if (q.r) d.insertAdjacentHTML("beforeend", `<div class="ends"><span>Muy insatisfecho</span><span>Muy satisfecho</span></div>`);
+  if (q.nps) d.insertAdjacentHTML("beforeend", `<div class="ends"><span>Nada probable</span><span>Muy probable</span></div>`);
+  var al = document.createElement("div"); al.className = "alerta";
+  if (q.alerta){
+    al.textContent = `Lamentamos lo ocurrido. Le pedimos informarlo directamente a ${q.alerta === "comedor" ? "la administración del comedor" : "SH Gestión"} para investigarlo de inmediato.`;
+    d.appendChild(al);
+  }
+  return d;
+}
+
+function obligatorias(){ return ENCUESTAS[tipo].flatMap(s => s.q).filter(q => !q.t); }
+function progreso(){
+  if (!tipo) return;
+  const req = obligatorias(), ok = req.filter(q => respuestas[q.k] !== undefined).length;
+  $("#bar").style.width = Math.round(ok / req.length * 100) + "%";
+}
+
+document.querySelectorAll(".tipo").forEach(b => b.onclick = () => elegir(b.dataset.tipo));
+function elegir(t){
+  tipo = t;
+  document.querySelectorAll(".tipo").forEach(x => x.setAttribute("aria-pressed", x.dataset.tipo === t));
+  render();
+}
+// QR directo: encuesta.html?tipo=corporativo  o  ?tipo=marina
+// También acepta ?tipo=corporativo y ?tipo=marina
+const ALIAS = {corporativo:"linea", marina:"transportado"};
+const _t = (new URLSearchParams(location.search).get("tipo") || "").toLowerCase();
+const pre = ALIAS[_t] || _t;
+if (ENCUESTAS[pre]){ elegir(pre); $("#cardTipo").classList.add("hidden"); }
+
+/* ---------- Envío ---------- */
+$("#form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!tipo) return;
+  const faltan = obligatorias().filter(q => respuestas[q.k] === undefined);
+  document.querySelectorAll(".q").forEach(d => d.classList.toggle("err", faltan.some(q => q.k === d.dataset.k)));
+  if (faltan.length){
+    document.querySelector(`.q[data-k="${faltan[0].k}"]`).scrollIntoView({behavior:"smooth", block:"center"});
+    return;
+  }
+  const preguntas = ENCUESTAS[tipo].flatMap(s => s.q);
+  const payload = {
+    tipo,
+    enviado: new Date().toISOString(),
+    campos: preguntas.map(q => ({k:q.k, l:q.l, escala:q.r ? "1-5" : q.nps ? "0-10" : q.t ? "texto" : "opcion"})),
+    valores: Object.fromEntries(preguntas.map(q => [q.k, respuestas[q.k] ?? ""]))
+  };
+  const btn = $("#enviar"); btn.disabled = true; btn.textContent = "Enviando…";
+  const ok = await enviar(payload);
+  if (!ok) guardarPendiente(payload);
+  $("#form").classList.add("hidden");
+  $("#gracias").classList.remove("hidden");
+  if (!ok) $("#graciasTxt").textContent = "Sin conexión en este momento: su respuesta quedó guardada y se enviará automáticamente.";
+  $("#bar").style.width = "100%";
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+async function enviar(p){
+  try{
+    await fetch(ENDPOINT, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(p)});
+    return true;
+  }catch(err){ return false; }
+}
+function leerPendientes(){ try{ return JSON.parse(localStorage.getItem("encuesta_pendientes") || "[]"); }catch(e){ return []; } }
+function guardarPendiente(p){ try{ const l = leerPendientes(); l.push(p); localStorage.setItem("encuesta_pendientes", JSON.stringify(l)); }catch(e){} }
+async function reenviar(){
+  const l = leerPendientes(); if (!l.length) return;
+  const resto = [];
+  for (const p of l) if (!(await enviar(p))) resto.push(p);
+  try{ localStorage.setItem("encuesta_pendientes", JSON.stringify(resto)); }catch(e){}
+}
+window.addEventListener("online", reenviar); reenviar();
+</script>
+</body>
+</html>
